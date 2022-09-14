@@ -3,13 +3,23 @@ const app = express();
 const cors = require('cors');
 const pool = require('./db');
 const path = require('path');
+const { dirname } = require('path');
+const PORT = process.env.PORT || 4000;
+
+//process.env.PORT
+//process.env.NODE_ENV => production or undefined
+
 
 //middleware
 app.use(cors());
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
+if(process.env.NODE_ENV === "production") {
+  //serve static client
+  //npm run build
+  app.use(express.static(path.join(__dirname, "client/build")));
+}
 
 //routes////////////////////////////////////////////////////
 //creat a todo
@@ -71,6 +81,10 @@ app.delete("/todos/:id", async (req, res) => {
   }
 })
 
-app.listen(4000, () => {
-console.log('server has started on port 4000')
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build/index.html"));
+})
+
+app.listen(PORT, () => {
+console.log(`server has started on port ${PORT}`)
 });
